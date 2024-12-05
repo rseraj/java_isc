@@ -1,1 +1,0 @@
-moduleSearchIndex = [{"l":"session7"}];updateSearchResults();

@@ -1,1 +1,0 @@
-typeSearchIndex = [{"l":"All Classes and Interfaces","u":"allclasses-index.html"},{"p":"session7","l":"Department"},{"p":"session7","l":"Employee"},{"p":"session7","l":"ORMExample"}];updateSearchResults();

@@ -1,0 +1,54 @@
+@startuml
+actor Client
+participant "Client" as C
+participant "Server" as S
+participant "VerificationRequest" as VR
+participant "Certificate" as Cert
+participant "Socket" as Sock
+participant "CertificateValidation" as CV
+participant "CRL Check" as CRL
+participant "Signature Validation" as SV
+participant "File Storage" as FS
+
+== Client Side ==
+Client -> C: start("127.0.0.1", 5000)
+C -> C: get_password()
+C -> C: load keystore
+C -> C: get privateKey and certChain
+C -> C: sign data
+C -> C: create JSON payload
+C -> Sock: send JSON payload
+
+== Server Side ==
+S -> S: start(5000)
+S -> Sock: accept connection
+S -> Sock: read UTF message
+S -> VR: map JSON to VerificationRequest
+S -> Cert: validate certificateChain
+Cert -> CV: validateCertificateChain(certChain)
+CV -> CRL: check certificate revocation (CRL)
+CRL -> CV: CRL status (Revoked/Not Revoked)
+CV -> CV: check certificate format (X.509)
+CV -> CV: check certificate chain completeness
+CV -> CV: validate certificate signatures
+CV -> CV: validate certificate validity periods
+CV -> CV: validate key usages
+CV -> CV: validate common names
+CV -> CV: validate AKI/SKI
+CV -> CV: validate basic constraints
+CV -> S: certificate chain valid/invalid
+
+== Validate Signature ==
+S -> SV: validateSignature(request)
+SV -> SV: Decode base64 data and signature
+SV -> Cert: Extract public key
+SV -> SV: Verify digital signature
+SV -> S: Signature valid/invalid
+
+== If Certificate and Signature are Valid ==
+S -> FS: save JSON data
+S -> FS: convert JSON to DER
+FS -> S: JSON and DER saved successfully
+
+S -> S: close connection
+@enduml
